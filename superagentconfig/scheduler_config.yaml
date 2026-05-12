@@ -1,0 +1,32 @@
+# Scheduler 调度服务配置
+
+scheduler:
+  # 启动模式配置
+  enabled: true                    # 是否启用调度器（false则不启动）
+  standalone: true                 # true=独立启动调度服务（单独进程），false=随SuperAgent启动
+  port: 7702                       # 服务端口
+  host: "0.0.0.0"                  # 服务地址
+
+  # 日志配置
+  file_log_enable: false           # 是否写入文件，默认 false（控制台输出）
+  log_dir: "./schedulerlog"        # 日志目录
+  log_file: "scheduler.log"        # 日志文件名
+  max_log_size: 10485760           # 单个日志文件最大大小（10MB）
+  log_retention: 30                # 日志保留天数
+
+  # 默认任务配置
+  default_superagent_url: "http://localhost:7701"  # SuperAgent 服务地址
+
+  # 默认定时任务
+  default_jobs:
+    - name: "每日会话摘要"
+      enabled: false
+      job_type: "conversation_summary"
+      cron: "0 2 * * *"               # 每天凌晨2点
+      session_id: ""                  # 空表示所有会话
+
+    - name: "每日记忆清理"
+      enabled: false
+      job_type: "memory_cleanup"
+      cron: "0 3 * * *"               # 每天凌晨3点
+      days_to_keep: 30

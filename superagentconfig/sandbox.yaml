@@ -1,0 +1,14 @@
+# -*- coding: utf-8 -*-
+# Sandbox 配置文件
+
+container_name: "agent-sandbox"
+#image_name: "python:3.12-slim"
+image_name: "wlagent-sandbox:1.0"
+container_workspace: "/workspace"
+memory_limit: "1024m"
+cpus: 1
+network: "bridge"
+workspace_subdirs:
+  - "input"
+  - "output"
+  - "scripts"

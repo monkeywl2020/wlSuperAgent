@@ -1,0 +1,109 @@
+# -*- coding: utf-8 -*-
+
+#记忆系统配置文件
+
+#包含所有模块的配置：工作目录、压缩、摘要、Embedding、LLM等
+
+
+# 基础配置
+working_dir: "./workspace/memory_data"  # 工作目录
+max_input_length: 128000  # 最大输入token数
+compact_ratio: 0.8  # 压缩触发比例（当token达到max_input_length * compact_ratio时触发）
+
+# 工具结果压缩配置
+tool_result:
+  threshold: 1000  # 工具结果压缩阈值（字符数）
+  retention_days: 30  # 工具结果保留天数
+
+# 搜索配置
+search:
+  vector_weight: 0.7  # 向量搜索权重
+  bm25_weight: 0.3  # BM25搜索权重
+  top_k: 5  # 搜索返回结果数
+
+  # QA提取和分块配置
+  enable_qa_extraction: true  # 是否启用QA提取（启用后从记忆中提取问答对） # 这个不开启就是整个文档作为一个chunk 这样根本没啥用
+  chunk_size: 500  # 分块大小（字符数），超过此大小的QA对会单独成块
+  overlap: 50  # 分块重叠大小
+
+# SQLite 向量库配置
+vector_db:
+  db_path: "./workspace/memory_data/vectors.db"  # 向量数据库路径
+  table_name: "embeddings"  # 表名
+  dimension: 1024  # 向量维度（根据Embedding模型调整）
+
+# Embedding 模型配置
+embedding:
+  provider: "tei"  # 提供商：local / openai / huggingface / tei
+  model_name: "Qwen3-Embedding-0.6B"  # 模型名称
+  device: "gpu"  # 设备：cpu / cuda
+  batch_size: 32  # 批处理大小
+  dimension: 1024  # 向量维度（根据Embedding模型调整）
+
+# LLM 配置（用于压缩和摘要）
+llm:
+  provider: "openai"  # 提供商：openai / anthropic / local
+  model: "nuwa"  # 模型名称
+  api_key: "EMPTY"  # API密钥
+  base_url: "http://172.16.11.183:60001/v1"  # 自定义API地址
+  max_tokens: 4000  # 最大输出token
+  top_p: 0.95
+  temperature: 0.6
+  presence_penalty: 0.0
+  extra_body: {
+    "top_k": 20,
+    "min_p": 0.0,
+    "repetition_penalty": 1.0,
+    #"chat_template_kwargs": {"enable_thinking": False},
+  }
+
+# 压缩提示词配置
+compress_prompt: |
+  请将以下对话压缩成简洁的摘要，保留关键信息。
+  对话内容：
+  {messages}
+
+  请生成压缩摘要：
+
+# 摘要提示词配置
+summarize_prompt: |
+  请分析以下对话，生成人类可读的摘要，并提取有价值的信息。
+
+  对话内容：
+  {messages}
+
+  请按以下格式输出：
+  ## 摘要
+  （简要总结对话内容）
+
+  ## 关键信息
+  - 信息点1
+  - 信息点2
+
+  ## 长期记忆
+  （如果有用户偏好或重要信息需要长期记住，请写在这里）
+
+# 长期记忆提取提示词
+longterm_prompt: |
+  请分析以下对话，提取需要长期记忆的用户偏好和重要信息。
+
+  对话内容：
+  {messages}
+
+  如果没有需要长期记忆的信息，请回复"无"。
+  否则请列出需要长期记住的信息：
+
+# QA提取提示词
+qa_extract_prompt: |
+  请从以下记忆文本中提取问答对。
+  要求：
+  1. 每个问答对应该是有意义的信息（重要事实、偏好、约定等）
+  2. 问题要简洁，能概括回答的核心
+  3. 回答要完整，保留关键信息
+  4. 如果文本中没有明确的信息，请只回复"无"
+  5. 输出的格式必须是：Q:问题\nA:回答（每对之间用空行分隔）
+
+  记忆文本：
+  {memory_text}
+
+  请输出问答对（只输出问答对，不要其他内容）：
