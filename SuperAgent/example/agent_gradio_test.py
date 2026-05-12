@@ -116,7 +116,8 @@ def stream_response(message: str, history: list) -> Generator[str, None, None]:
 
                     if accumulated_content.strip():
                         # 黑色显示正式回答（默认就是黑色，可不加 style）
-                        black_part = accumulated_content.strip().replace(chr(10), '<br>')
+                        #black_part = accumulated_content.strip().replace(chr(10), '<br>')
+                        black_part = accumulated_content.strip()
                         display_parts.append(black_part)
 
                     # 合并显示内容
